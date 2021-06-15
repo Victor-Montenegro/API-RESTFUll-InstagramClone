@@ -1,0 +1,79 @@
+<!DOCTYPE HTML>
+<html lang="pt-br">
+	<head>
+		<meta charset="UTF-8">
+
+		<title>Instagram Clone - WEB</title>
+		
+		<!-- JQuery -->
+		<script src="http://code.jquery.com/jquery-3.1.1.min.js"></script>
+
+		<!-- bootstrap - link cdn -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+	
+		<!-- incluindo css -->
+		<link href="css/style.css" rel="stylesheet">
+
+	</head>
+
+	<body>
+
+		<div class="container home">
+            <div class="row">
+                <div class="col-md-2"></div>
+                
+                <div class="col-md-4">
+                	<img src="images/celulares.jpg" class="img-responsive img-center"/>
+                </div>
+                
+                <div class="col-md-4 painel-login">
+					<div class="panel panel-default">
+						<div class="panel-body">
+							<div class="row">
+								<div class="col-md-12">
+
+									<img src="images/logo1.jpg" class="img-responsive img-center" />
+									<br />
+                                    
+                                    <%if(errors) {%>
+                                        <div class="alert alert-danger">
+                                            <ul>
+                                                <% errors.forEach( e =>{%>
+                                                    <li><%= e.msg%></li>
+                                                <%})%>
+                                            </ul>
+                                    <%}%>    
+									<form action="/cadastrando" method="POST">
+                                        
+                                        <div class="form-group">
+											<input type="email" value="<%= params.email%>" name="email" id="email" class="form-control" placeholder="email">
+										</div>
+
+										<div class="form-group">
+											<input type="text" value="<%= params.usuario%>" name="usuario" id="usuario" class="form-control" placeholder="Nome de usuário">
+										</div>
+
+										<div class="form-group">
+											<input type="password" name="senha" id="senha" class="form-control" placeholder="Senha">
+										</div>
+
+
+										<div class="form-group">
+											<button class="btn btn-secundary btn-login">cadastrar-se</button>
+										</div>
+
+										
+									</form>
+								
+								</div>
+							</div>
+						</div>
+					</div>
+                </div>
+
+                <div class="col-md-2"></div>
+            </div>
+        </div>
+		
+	</body>
+</html>

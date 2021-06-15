@@ -11,6 +11,13 @@ body{
 	border-color: #3897f0;
 }
 
+.btn-secundary{
+	background-color: #24bf03;
+	border-color: #24bf03;
+	color: #fff;
+
+}
+
 .btn-login{
 	width: 100%;
 	font-weight: bold;

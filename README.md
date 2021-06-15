@@ -1,5 +1,5 @@
 # API-RESTFull
-Implementando uma API com os conceitos RESTFull que realizar a consulta e a inserção de publicações, atualização e remoção de comentarios dentro da publicação.
+Implementado uma aplicação do Instagram clone, usando os serviços de uma API-RESTFull-Publicacao
 
 
 
