@@ -8,11 +8,12 @@ const url = `mongodb://localhost:27017`;
 
 // nome do banco de dados
 const nameDB = `instagramUsuarios`;
-const client = new clientMongoDB(url);
 
 //conectando com banco de dados
 const createConnection = (data) =>{
 
+    const client = new clientMongoDB(url);
+        
     client.connect(err =>{
 
         assert.equal(null,err);
@@ -21,26 +22,32 @@ const createConnection = (data) =>{
         const db = client.db(nameDB);
 
         //função de interação com o banco
-        query(data,db);
+        if(query(data,db)){
+            
+            client.close()
+            console.log(`conexao fechada`)
+        }
 
-        client.close();
     });
 };
 
 //função de interação com o banco
 function query(data,db){
 
-    console.log(data);
-    // const collection = db.collection(data.collection);
-
-    // switch(data.operacao){
-    //     case `find`:
-    //         collection.find(data.usuario,data.callback)
-    //         break;
-    //     case `insert`:
-    //         collection.insert(data.usuario,data.callback)
-    //         break;
-    // }
+    const collection = db.collection(data.collection);
+    console.log(data)
+    switch(data.operacao){
+        case `find`:
+            collection.find(data.usuario,data.callback)
+            console.log(`fim de find`)
+            return true;
+            break;
+        case `insert`:
+            collection.insertOne(data.usuario,data.callback)
+            return true;
+            break;
+    }
+    
 }
 
 module.exports = () =>{
