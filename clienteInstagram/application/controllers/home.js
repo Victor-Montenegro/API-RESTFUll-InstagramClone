@@ -7,7 +7,7 @@ module.exports.index = (app,req,res) => {
                 <head>
                     <script>
                         setTimeout(()=>{
-                            window.location.href = 'http://localhost:3000/';
+                            window.location.href = 'http://localhost:8080/';
                         },4000);
                     </script>
                 </head>

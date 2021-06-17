@@ -2,7 +2,7 @@
 const express = require('express');
 const bodyParser = require(`body-parser`);
 const consign = require(`consign`);
-const expressSession = require(`express-session`)
+const expressSession = require(`express-session`);
 
 //chamando a função express
 const app = express();

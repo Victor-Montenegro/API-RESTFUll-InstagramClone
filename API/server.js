@@ -3,14 +3,31 @@ const express = require('express');
 const mongoClient = require(`mongodb`).MongoClient;
 const objectIdDB = require(`mongodb`).ObjectId;
 const bodyParser = require('body-parser');
+const multiparty = require(`connect-multiparty`)
 const {body, validationResult} = require('express-validator');
-
+const fs = require(`fs`);
 // chamando a função express
 const app = express();
 
 //configurando middlewares para tratar tipos de dados vindo da requisição x-www-form-urlencoded | JSON | files 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
+app.use(multiparty())
+
+//configurando middleware response para a permissção do request do browser para a nossa API
+app.use((req,res,next) => {
+
+    //dando acesso aos dominios/aplicações cliente as response do servidor pela propriedade Access-Control-Allow-Origin
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    // ira configurar quais que são os metodos() que a origem/aplicação/dominio cliente  podem requitar 
+    res.setHeader("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
+    // irá habilitar que a requisição efetuada pela origem tenha cabençahos reescritos atraves do content-type
+    res.setHeader("Access-Control-Allow-Headers", "content-type"); // --> devemos informar  para o cabeçalho do nosso request que irá receber um JSON no body da requisição, ou seja, que vamos modificar/reescrever o contenty-type como JSON, por isso devemos permitir a modificação do content-type
+    // habilitar as credenciais do dominio
+    res.setHeader("Access-Control-Allow-Crentials", true);
+
+    next();
+});
 
 // port do server
 const port = 3000;
@@ -65,32 +82,62 @@ app.get(`/`, (req, res) => {
 app.post(
     '/api',
     body(`titulo`).notEmpty(),
-    body(`png_imagem`).notEmpty(),
+    body(`arquivo`).custom((value, {req}) =>{
+        if(req.files.arquivo === undefined){
+            throw new Error("É obrigatorio uma imagem!");
+        }
+            return true;
+    }),
     (req, res) => {
         
-        const dadosPublicacao = req.body;
+
+        // validando request do client
         const errors = validationResult(req);
         if(!errors.isEmpty()){
-
+            
             res.status(400).json({errors: errors.array()});
             return;
         }
 
-        //confgurando a inserção de dados para o banco dedados
-        const dados = { 
-            operacao: `insert`,
-            usuario: dadosPublicacao,
-            collection: `publicacao`,
-            callback: (err,records)=>{
-                if(err){
-                    res.status(500).json({err});
-                }else{
-                    res.status(200).json(records);
-                }
-            }
-        };
+        //instanciando localização temporaria do arquivo
+        const path_origem = req.files.arquivo.path;
+        
+        //criando um identificador unico para o nome da imagem
+        const date = new Date().getTime();
+        const url_imagem = `${date}_${req.files.arquivo.originalFilename}`;
+        const path_destino = `./uploads/${url_imagem}`;
 
-        createConnection(dados);
+        fs.rename(path_origem,path_destino, function(err){
+
+            if(err){
+                res.status(500).json(err);
+            }else{
+                
+                const dadoAnexo = {
+                    titulo: `${req.body.titulo}`,
+                    url_imagem: url_imagem 
+                };
+                
+                //confgurando a inserção de dados para o banco dedados
+                const dados = { 
+                    operacao: `insert`,
+                    usuario: dadoAnexo,
+                    collection: `publicacao`,
+                    callback: (err,records)=>{
+                        if(err){
+                            res.status(500).json({err});
+                        }else{
+                            res.status(200).json(records);
+                        }
+                    }
+                };
+
+                createConnection(dados);
+            }
+
+        });
+        
+        
 });
 
 // configurando route "/api" para a consulta de todas as  publicações via "GET"
@@ -154,6 +201,18 @@ app.get(`/api/:id`, (req,res)=>{
 
     createConnection(dados)
 })
+
+                    // const { param } = require('express-validator');
+
+                    // app.post(
+                    // '/object/:id',
+                    // param('id').customSanitizer(value => {
+                    //     return ObjectId(value);
+                    // }),
+                    // (req, res) => {
+                    //     // Handle the request
+                    // },
+                    // );
 
 //configurando route "/api/:id" para a atualização de comentarios dentro da publicação via "PUT"
 app.put(

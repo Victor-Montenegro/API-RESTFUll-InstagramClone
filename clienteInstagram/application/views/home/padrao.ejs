@@ -28,6 +28,34 @@
 					return false;
 				});
 
+				$('#btn-publicar').click(function(){
+
+					//criar um form Data
+					const dataFrom = new FormData();
+
+					const arquivo = document.getElementById("arquivo").files[0];
+					const titulo = document.getElementById("titulo").value;
+
+					dataFrom.append("arquivo",arquivo);
+					dataFrom.append("titulo",titulo);
+
+					//criando xmlHTTPRequest
+					const xhr = new XMLHttpRequest();
+
+					//verificando a mudança de estado
+					xhr.onreadystatechange = function(){
+						if(xhr.readyState == 4){
+							const response = xhr.responseText;
+
+							document.getElementById("mensagem").innerHTML = "publicação realizada!"
+						}
+					}
+
+					//enviando request para a api
+					xhr.open("POST","http://localhost:3000/api")
+					xhr.send(dataFrom);
+				});
+
 			});
 		</script>
 
