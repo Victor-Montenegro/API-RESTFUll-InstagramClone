@@ -17,6 +17,86 @@
 		<script>
 			$(document).ready(function(){
 
+				function carregarPublicao(){
+
+					//instanciando o xmlHTTPRequest
+
+					const xhr = new XMLHttpRequest();
+
+					//recebrá os dados apos o total carregamento da pagina
+					xhr.onload = function(){
+
+						if(xhr.status == 200){
+							
+							const response = JSON.parse(xhr.responseText);
+							console.log(response);
+							response.forEach(r =>{
+
+								$('#container_timeline').append(
+									'<div class="publicacao">' +
+										'<span class="titulo">' + r.titulo + '</span>' +
+										'<img src="http://localhost:3000/api/imagem/' + r.url_imagem +'">' +
+										'<div class="comentarios" id="comentarios_'+ r._id +'"> </div>'+
+										'<div class="comentar">'+
+											'<input type="text" id="comentario_'+r._id+'" class="form-control input_comentario" placeHolder="Adicione um comentario...">'+
+											'<button type="button"  value="'+ r._id +'" class="btn btn-default btn_postagem" >Comentar</button>' +
+										'</div>'+
+									'</div>'
+								)
+
+								if(r.comentarios != undefined){
+
+									r.comentarios.forEach(rc =>{
+										
+										$('#comentarios_' + r._id).append(
+											'<div class="txt_comentario">' + 
+												'<strong>'+ rc.usuario +': '+ '</strong>' +
+												rc.comentario +
+											'</div>'
+										)
+
+										
+									});
+								}
+							});
+
+
+							//adicionando comentarios da publicacao
+							$(".btn_postagem").click(function(){
+
+								//capturando comentario da publicacao
+								const id_publicacao = this.value;
+								const id_comentario = "comentario_" + id_publicacao;
+								const comentario = document.getElementById(id_comentario).value;
+								const usuario = '<%=user%>';
+
+								const xhr = new XMLHttpRequest();
+
+
+								xhr.onload = function(){
+
+									if(xhr.status == 200){
+										window.location.href = "/home"
+									}
+								}
+
+								xhr.open('PUT','http://localhost:3000/api/'+ id_publicacao);
+								xhr.setRequestHeader('Content-Type', 'application/json');
+								xhr.send(JSON.stringify({comentario: comentario, usuario: usuario}));
+
+							});
+
+						}
+					}
+
+					//iniciando o request
+					xhr.open('GET',"http://localhost:3000/api");
+					xhr.send();
+
+				}
+
+				carregarPublicao()
+
 				$('#btn_incluir').click(function(){
 					$('#container_timeline').hide();
 					$('#container_form').show();
@@ -28,6 +108,7 @@
 					return false;
 				});
 
+				//fará um request via xmlHTTPRequest para api servidor para adicionar uma publicao
 				$('#btn-publicar').click(function(){
 
 					//criar um form Data
@@ -56,6 +137,7 @@
 					xhr.send(dataFrom);
 				});
 
+				
 			});
 		</script>
 
@@ -76,7 +158,7 @@
 
 		<div class="container">
 			<div class="col-md-2"></div>
-			<div class="col-md-8" id="container_timeline"><%= user%></div>
+			<div class="col-md-8" id="container_timeline"></div>
 			
 		</div>
 
