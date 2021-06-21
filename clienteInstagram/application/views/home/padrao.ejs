@@ -29,7 +29,6 @@
 						if(xhr.status == 200){
 							
 							const response = JSON.parse(xhr.responseText);
-							console.log(response);
 							response.forEach(r =>{
 
 								$('#container_timeline').append(
@@ -42,14 +41,15 @@
 											'<button type="button"  value="'+ r._id +'" class="btn btn-default btn_postagem" >Comentar</button>' +
 										'</div>'+
 									'</div>'
-								)
+								);
 
 								if(r.comentarios != undefined){
 
 									r.comentarios.forEach(rc =>{
-										
+
 										$('#comentarios_' + r._id).append(
 											'<div class="txt_comentario">' + 
+													'<button type="button" id="'+ r.donoPublicacao +'" value="'+ rc.id_comentario + '" class="btn btn-default btn_remover_postagem"> X </button>'+
 												'<strong>'+ rc.usuario +': '+ '</strong>' +
 												rc.comentario +
 											'</div>'
@@ -59,6 +59,29 @@
 									});
 								}
 							});
+
+							//remove comentarios de uma id_publicacao
+							$(".btn_remover_postagem").click(function(){
+								
+								const id_comentario = this.value;
+								const user = '<%= user%>';
+								const donoPublicacao = this.id;
+								if(user == donoPublicacao){
+									//chamando XMLHttpRequest
+										const xhr = new XMLHttpRequest();
+
+										xhr.onreadystatechange = function(){
+
+											if(xhr.readyState == 4){
+												window.location.href = "/home";
+											}
+										};
+
+										//realizando conexao 
+										xhr.open('DELETE','http://localhost:3000/api/'+id_comentario);
+										xhr.send();
+								}
+							});	
 
 
 							//adicionando comentarios da publicacao
@@ -116,9 +139,11 @@
 
 					const arquivo = document.getElementById("arquivo").files[0];
 					const titulo = document.getElementById("titulo").value;
+					const donoPublicacao =  '<%=user%>';
 
 					dataFrom.append("arquivo",arquivo);
 					dataFrom.append("titulo",titulo);
+					dataFrom.append("donoPublicacao",donoPublicacao);
 
 					//criando xmlHTTPRequest
 					const xhr = new XMLHttpRequest();
@@ -129,6 +154,7 @@
 							const response = xhr.responseText;
 
 							document.getElementById("mensagem").innerHTML = "publicação realizada!"
+							window.location.href = "/home"
 						}
 					}
 

@@ -68,6 +68,32 @@ function query(db,data){
 
 }
 
+//inserindo uma publicacao caso banco esteja vazio
+const teste = {
+    operacao: 'find',
+    usuario: {},
+    collection: 'publicacao',
+    callback: function(err,records){
+        records.toArray(function(err,result){
+            if(result.length == 0){
+                let primeira = {
+                    operacao: 'insert',
+                    usuario: {
+                        titulo: "Pinguins!",
+                        url_imagem: "1624276520569_imagem2.jpg", 
+                        donoPublicacao: "admin"
+                    },
+                    collection: 'publicacao',
+                    callback: function(err,records){}
+                }
+                createConnection(primeira)
+            }
+        })
+    }
+}
+
+createConnection(teste)
+
 //iniciando servidor na porta 3000
 app.listen(port);
 console.log(`servidor ON na porta ${port}`);
@@ -99,6 +125,7 @@ app.post(
             return;
         }
 
+
         //instanciando localização temporaria do arquivo
         const path_origem = req.files.arquivo.path;
         
@@ -112,10 +139,10 @@ app.post(
             if(err){
                 res.status(500).json(err);
             }else{
-                
                 const dadoAnexo = {
                     titulo: `${req.body.titulo}`,
-                    url_imagem: url_imagem 
+                    url_imagem: url_imagem, 
+                    donoPublicacao: req.body.donoPublicacao
                 };
                 
                 //confgurando a inserção de dados para o banco dedados
@@ -202,18 +229,6 @@ app.get(`/api/:id`, (req,res)=>{
     createConnection(dados)
 })
 
-                    // const { param } = require('express-validator');
-
-                    // app.post(
-                    // '/object/:id',
-                    // param('id').customSanitizer(value => {
-                    //     return ObjectId(value);
-                    // }),
-                    // (req, res) => {
-                    //     // Handle the request
-                    // },
-                    // );
-
 //configurando route "/api/:id" para a atualização de comentarios dentro da publicação via "PUT"
 app.put(
     `/api/:id`,
@@ -267,7 +282,14 @@ app.delete(`/api/:id`, (req,res)=>{
         operacao: `update`,
         usuario: {},
         update: {
-            pull: { comentarios: {id_comentario: objectIdDB(req.params.id)}}
+            $pull: { 
+                comentarios: {
+                    id_comentario: objectIdDB(req.params.id)
+                }
+            }
+        },
+        options: {
+            multi: true
         },
         collection: `publicacao`,
         callback: (err, records) =>{
@@ -285,12 +307,11 @@ app.delete(`/api/:id`, (req,res)=>{
     createConnection(dados);
 });
 
+//busca a imagem da publicacao 
 app.get(`/api/imagem/:imagem`, (req, res) =>{
 
     //capturando url da imagem
     const url_imagem = req.params.imagem;
-    console.log(url_imagem);
-
     //chamando funcao que localizará o arquivo/imagem
     fs.readFile(`./uploads/${url_imagem}`,(err,imagem)=>{
         if(err){
