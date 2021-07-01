@@ -2,6 +2,14 @@
 Implementado uma aplicação do Instagram clone, usando os serviços de uma API-RESTFull-Publicacao
 
 
+## Instruções! 
+
+    Deve executar o arquivo server.js para iniciar o servidor da API localizado em: /API-RESTFull-InstagramClone/API/server.js
+
+    Também deve executar o arquivo app.js para iniciar o cliente que consumirar a API localizado em:  /API-RESTFull-InstagramClone/clienteInstagram/app.js
+
+    route do cliente
+    http://localhost:8080/home
 
 # Victor Montenegro 
 
